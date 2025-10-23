@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Esparagoza Dental Hub</title>
+<style>
+body{font-family:"Poppins",sans-serif;background:#f4f9ff;margin:0;padding:0;color:#07375c}
+h1,h2,h3,p,ul{margin:0;padding:0}
+a{text-decoration:none}
+.header{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:10px}
+.header img{height:60px;width:auto}
+.header h1{font-size:22px;font-weight:700;color:#0b6bcb;text-align:center;margin-top:4px}
+#menuBtn{position:absolute;right:20px;background:none;border:none;font-size:26px;color:#0b6bcb;cursor:pointer;line-height:1}
+
+.card,.cal-card{background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(7,36,63,.06);margin:18px auto;max-width:520px;padding:18px;width:94%}
+.cal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cal-month{font-weight:700;color:#0b6bcb;font-size:18px}
+.nav-btn{background:linear-gradient(90deg,#2ea0ff,#0b6bcb);color:#fff;border:none;padding:6px 10px;border-radius:10px;cursor:pointer}
+.weeknames{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;color:#3b6b90;font-size:12px;text-align:center;margin-bottom:6px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;width:100%;box-sizing:border-box}
+.day-tile{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#fff;color:#0b6bcb;font-weight:600;cursor:pointer;transition:background .2s;min-width:0;overflow:hidden}
+.day-tile:hover{background:#e0f0ff}
+.day-tile.today{border:2px solid #0b6bcb}
+.day-tile.closed{background:#eee;color:#aaa;cursor:not-allowed}
+.slot-btn{width:100%;padding:8px;border:none;border-radius:8px;background:#0b6bcb;color:#fff;font-weight:600;cursor:pointer;transition:all .2s;margin:4px 0}
+.slot-btn:hover{background:#2ea0ff}
+.slot-btn.selected{background:#4fc3f7}
+.slot-btn.booked{background:#ccc!important;color:#666!important;cursor:not-allowed}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) scale(.9);background:#0b6bcb;color:#fff;padding:10px 18px;border-radius:12px;opacity:0;transition:all .3s ease;z-index:99;font-size:15px}
+.toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+.toast.error{background:#d9534f}
+.toast.success{background:#5cb85c}
+#toastWrap{position:fixed;bottom:0;left:0;width:100%;z-index:99;display:flex;flex-direction:column;align-items:center;gap:6px}
+
+/* 🔹 Modal overlay and menu */
+#modalOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);justify-content:center;align-items:center;z-index:200}
+#modalMenu,#sectionContent{background:#fff;border-radius:14px;max-width:420px;width:90%;padding:20px;box-shadow:0 12px 30px rgba(0,0,0,.1);animation:fadeIn .3s ease;max-height:85vh;overflow-y:auto}
+.menu-tile{background:rgba(11,107,203,.1);color:#0b6bcb;font-weight:600;text-align:center;border:none;padding:14px;width:100%;margin:8px 0;border-radius:10px;cursor:pointer;transition:.2s}
+.menu-tile:hover{background:rgba(11,107,203,.25)}
+#closeModal,#backBtn{background:#0b6bcb;color:#fff;border:none;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer}
+#closeModal{position:absolute;top:16px;right:20px;font-size:18px}
+.fade-section{animation:fadeInUp .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="width:100%;position:relative;display:flex;align-items:center;justify-content:center;">
+    <img src="https://i.imgur.com/t942gBV.png" alt="logo">
+    <button id="menuBtn">&#9776;</button>
+  </div>
+  <h1>Esparagoza Dental Hub</h1>
+</div>
+
+<div class="card">
+  <form id="bookingForm">
+    <h2 style="text-align:center;color:#0b6bcb;margin-bottom:10px;">Book Appointment</h2>
+    <label>Name:</label>
+    <input type="text" id="name" required style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bottom:10px;">
+    <label>Email:</label>
+    <input type="email" id="email" required style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bottom:10px;">
+    <label>Phone:</label>
+    <input type="tel" id="phone" required style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bottom:10px;">
+    <label>Service:</label>
+    <select id="service" required style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bottom:10px;">
+      <option value="">Select Service</option>
+      <option>Pediatric Dentistry</option>
+      <option>Restorative Dentistry (Tooth Filling)</option>
+      <option>Prosthodontics</option>
+      <option>Veneers Dental Crown</option>
+      <option>Cosmetic Dentistry</option>
+      <option>Oral Surgery</option>
+      <option>Orthodontics</option>
+    </select>
+    <label>Date:</label>
+    <input type="text" id="date" readonly style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bottom:10px;">
+    <div class="cal-card">
+      <div class="cal-top">
+        <button type="button" class="nav-btn" id="prevMonth">◀</button>
+        <div class="cal-month" id="monthTitle">Month</div>
+        <button type="button" class="nav-btn" id="nextMonth">▶</button>
+      </div>
+      <div class="weeknames">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+
+    <label>Time:</label>
+    <input type="text" id="time" readonly style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bottom:10px;">
+    <div id="slotsGrid"></div>
+
+    <label>Notes:</label>
+    <textarea id="notes" rows="3" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bottom:10px;"></textarea>
+    <button type="submit" style="width:100%;padding:10px;background:#0b6bcb;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;">Submit</button>
+  </form>
+</div>
+
+<div id="toastWrap"></div>
+
+<!-- 🔹 Modal -->
+<div id="modalOverlay">
+  <div id="modalMenu">
+    <button id="closeModal">×</button>
+    <h2 style="text-align:center;color:#0b6bcb;">Menu</h2>
+    <button class="menu-tile" data-section="about">About Us</button>
+    <button class="menu-tile" data-section="services">Services</button>
+    <button class="menu-tile" data-section="protocols">Protocols</button>
+    <button class="menu-tile" data-section="contact">Contact Us</button>
+  </div>
+
+  <div id="sectionContent" style="display:none;position:relative;">
+    <button id="backBtn">← Back</button>
+    <div id="sectionBody" style="margin-top:10px;"></div>
+  </div>
+  </div>
+
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, onValue, get, set, push, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+/* 🔹 Firebase Configuration */
+const firebaseConfig = {
+  apiKey: "AIzaSyCV39b2CkzS_tt75SVXa6z95s6f4qVlfLg",
+  authDomain: "esparagozadentalclinic-6a744.firebaseapp.com",
+  databaseURL: "https://esparagozadentalclinic-6a744-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "esparagozadentalclinic-6a744",
+  storageBucket: "esparagozadentalclinic-6a744.firebasestorage.app",
+  messagingSenderId: "959639046373",
+  appId: "1:959639046373:web:ccf39df13d94e527fcec0c"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* 🔹 DOM References */
+const calGrid = document.getElementById("calGrid");
+const monthTitle = document.getElementById("monthTitle");
+const prevMonth = document.getElementById("prevMonth");
+const nextMonth = document.getElementById("nextMonth");
+const dateInput = document.getElementById("date");
+const timeInput = document.getElementById("time");
+const slotsGrid = document.getElementById("slotsGrid");
+const toastWrap = document.getElementById("toastWrap");
+
+/* 🔹 Variables */
+let displayedYear, displayedMonth;
+let closedDates = {};
+let slotCounts = {};
+let maxSlots = 1;
+const TIME_SLOTS = [
+  "9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM",
+  "12:00 NN","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM"
+];
+const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const slotKey = s => s.replace(/[^a-zA-Z0-9]/g,"_").toLowerCase();
+
+/* 🔹 Toast Notification */
+function showToast(msg, type="info") {
+  const el = document.createElement("div");
+  el.className = "toast " + type;
+  el.textContent = msg;
+  toastWrap.appendChild(el);
+  setTimeout(()=>el.classList.add("show"),50);
+  setTimeout(()=>el.remove(),3000);
+}
+
+/* 🔹 Firebase Listeners */
+onValue(ref(db,"closed_dates"),s=>{closedDates=s.exists()?s.val():{};render()});
+onValue(ref(db,"settings/maxSlots"),s=>{maxSlots=s.exists()?s.val():1});
+onValue(ref(db,"slot_counts"),s=>{slotCounts=s.exists()?s.val():{};render()});
+
+/* 🔹 Calendar Rendering */
+function render(y,m){
+ const now=new Date();
+ if(!y&&!m){y=now.getFullYear();m=now.getMonth();}
+ displayedYear=y;displayedMonth=m;
+ const first=new Date(y,m,1);
+ monthTitle.textContent=first.toLocaleString("default",{month:"long",year:"numeric"});
+ calGrid.innerHTML="";
+ const start=first.getDay();
+ const daysInMonth=new Date(y,m+1,0).getDate();
+
+ for(let i=0;i<start;i++){
+   const e=document.createElement("div");
+   e.className="day-tile";
+   e.style.visibility="hidden";
+   calGrid.appendChild(e);
+ }
+
+ for(let d=1;d<=daysInMonth;d++){
+   const date=new Date(y,m,d);
+   const iso=fmt(date);
+   const div=document.createElement("div");
+   div.className="day-tile";
+   div.textContent=d;
+
+   if(closedDates[iso]) div.classList.add("closed");
+   else if(date<new Date().setHours(0,0,0,0)) div.style.opacity=.4;
+   else div.onclick=()=>{dateInput.value=iso;loadSlots(iso);showToast("Selected "+iso,"success")};
+
+   const today=new Date();today.setHours(0,0,0,0);
+   if(date.getTime()===today.getTime()) div.classList.add("today");
+   calGrid.appendChild(div);
+ }
+}
+prevMonth.onclick=()=>{const d=new Date(displayedYear,displayedMonth-1,1);render(d.getFullYear(),d.getMonth())};
+nextMonth.onclick=()=>{const d=new Date(displayedYear,displayedMonth+1,1);render(d.getFullYear(),d.getMonth())};
+render();
+
+/* 🔹 Load Available Time Slots (Gray if Full) */
+async function loadSlots(dateKey){
+  slotsGrid.innerHTML="";
+  const cSnap=await get(ref(db,`slot_counts/${dateKey}`));
+  const counts=cSnap.exists()?cSnap.val():{};
+
+  TIME_SLOTS.forEach(slot=>{
+    const k=slotKey(slot);
+    const c=counts[k]||0;
+    const full=c>=maxSlots;
+
+    const b=document.createElement("button");
+    b.className="slot-btn";
+    b.textContent=slot;
+
+    if(full){
+      b.classList.add("booked");
+      b.disabled=true;
+      b.textContent+=" 🔒 FULL";
+      b.style.background="#ccc";
+      b.style.color="#666";
+      b.style.cursor="not-allowed";
+    } else {
+      b.onclick=()=>{
+        timeInput.value=slot;
+        document.querySelectorAll(".slot-btn").forEach(x=>x.classList.remove("selected"));
+        b.classList.add("selected");
+      };
+    }
+    slotsGrid.appendChild(b);
+  });
+}
+
+/* 🔹 Submit Booking */
+document.getElementById("bookingForm").onsubmit=async e=>{
+ e.preventDefault();
+ const name=document.getElementById("name").value.trim(),
+  email=document.getElementById("email").value.trim(),
+  phone=document.getElementById("phone").value.trim(),
+  notes=document.getElementById("notes").value.trim(),
+  service=document.getElementById("service").value,
+  date=dateInput.value,time=timeInput.value;
+ if(!date||!time) return showToast("Select date & time!","error");
+
+ const key=slotKey(time);
+ const slotRef=ref(db,`slot_counts/${date}/${key}`);
+
+ try {
+   const booked=await runTransaction(slotRef,count=>(count||0)+1);
+   if(booked.snapshot.val()>maxSlots){
+     showToast("Time slot already full!","error");
+     return;
+   }
+   await set(push(ref(db,"bookings")),{
+     name,email,phone,service,date,time,notes,createdAt:new Date().toISOString()
+   });
+   showToast("Booking successful!","success");
+   e.target.reset();
+   timeInput.value="";
+   render(displayedYear,displayedMonth);
+ } catch(err){
+   console.error(err);
+   showToast("Booking failed!","error");
+ }
+};
+
+/* 🔹 Modal Logic */
+const overlay=document.getElementById("modalOverlay"),
+      menu=document.getElementById("modalMenu"),
+      section=document.getElementById("sectionContent"),
+      sectionBody=document.getElementById("sectionBody"),
+      menuBtn=document.getElementById("menuBtn"),
+      closeModal=document.getElementById("closeModal"),
+      backBtn=document.getElementById("backBtn");
+
+menuBtn.onclick=()=>{overlay.style.display="flex";menu.style.display="block";section.style.display="none"};
+closeModal.onclick=()=>overlay.style.display="none";
+backBtn.onclick=()=>{section.style.display="none";menu.style.display="block"};
+
+/* 🔹 Modal Content */
+const modalData = {
+  about: `
+    <div style="text-align:center;">
+      <img src="https://i.imgur.com/t942gBV.png" class="modal-logo" alt="logo" style="margin-bottom:10px;">
+      <h3>About Us</h3>
+      <p><b>Orthodontics, Implant & General Dentistry</b></p>
+      <p>Dr. Jeff Esparagoza provides dental services such as orthodontics, implant, and general dentistry.</p>
+    </div>
+  `,
+  services: `
+    <div style="text-align:center;">
+      <h3>Our Dental Services</h3>
+      <ul style="margin-top:10px;line-height:1.8;list-style:none;padding:0;">
+        <li>Pediatric Dentistry — 30 minutes</li>
+        <li>Restorative Dentistry (Tooth Filling) — 30 minutes</li>
+        <li>Prosthodontics — 30 minutes</li>
+        <li>Veneers Dental Crown — 30 minutes</li>
+        <li>Cosmetic Dentistry — 30 minutes</li>
+        <li>Oral Surgery — 30 minutes</li>
+        <li>Orthodontics — 30 minutes</li>
+      </ul>
+    </div>
+  `,
+  protocols: `
+    <div style="text-align:center;">
+      <h3>COVID-19 Dental Practice Protocols</h3>
+      <p>COVID-19 is caused by SARS-CoV-2. Common symptoms include fever, cough, fatigue, and loss of smell.</p>
+      <p>Dentists are at high risk; everyone must follow these protocols:</p>
+      <ul style="margin-top:10px;line-height:1.8;list-style:none;padding:0;">
+        <li>NO MASK, NO ENTRY</li>
+        <li>OBSERVE SOCIAL DISTANCING</li>
+        <li>ALCOHOL AVAILABLE FOR PATIENT USE</li>
+        <li>ONLY PATIENTS ALLOWED INSIDE TREATMENT ROOM</li>
+        <li>NO COMPANIONS EXCEPT MINORS/ELDERS</li>
+      </ul>
+      <p style="margin-top:8px;"><b>Clinic Hours:</b> Monday – Saturday, 9:00 AM – 4:00 PM</p>
+    </div>
+  `,
+  contact: `
+    <div style="text-align:center;">
+      <h3>Contact Us</h3>
+      <p style="margin-top:8px;">
+        📍 Kidapawan City, North Cotabato, Philippines
+      </p>
+      <p>📞 0977 780 9537</p>
+      <p>📧 esparagoza.jeffrey@gmail.com</p>
+    </div>
+  `
+};
+
+/* 🔹 Handle Modal Button Actions */
+document.querySelectorAll(".menu-tile").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const sec=btn.dataset.section;
+    sectionBody.innerHTML=modalData[sec] || "";
+    menu.style.display="none";
+    section.style.display="block";
+    sectionBody.classList.add("fade-section");
+  });
+});
+</script>
+</body>
+</html>
