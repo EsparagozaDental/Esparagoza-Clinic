@@ -15,8 +15,29 @@
   .cal-month{font-weight:700;color:#0b6bcb;font-size:18px}
   .nav-btn{background:linear-gradient(90deg,#2ea0ff,#0b6bcb);color:#fff;border:none;padding:6px 10px;border-radius:10px;cursor:pointer}
   .weeknames{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;color:#3b6b90;font-size:12px;text-align:center;margin-bottom:6px}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-  .day-tile{height:50px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#fff;color:#0b6bcb;font-weight:600;cursor:pointer;transition:background .2s}
+ /* ✅ FIXED calendar layout */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.day-tile {
+  aspect-ratio: 1 / 1; /* make perfect squares, prevents overlapping */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #fff;
+  color: #0b6bcb;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+  min-width: 0; /* ensures tiles shrink properly */
+  overflow: hidden; /* prevents text spillover */
+}
   .day-tile:hover{background:#eaf6ff}
   .day-tile.closed{background:#eee;color:#888;cursor:not-allowed}
   .day-tile.booked{background:#f3f3f3;color:#aaa;cursor:not-allowed}
