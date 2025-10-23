@@ -10,7 +10,45 @@
   body{margin:0;font-family:"Poppins",sans-serif;background:linear-gradient(135deg,#f7fbff,#eaf6ff,#dff2ff);color:#07243f;padding:18px}
   header{text-align:center;margin-bottom:10px}.logo{width:120px;border-radius:12px}
   h1{color:#0b6bcb;font-size:24px;font-weight:700;margin:10px 0}
-  .card,.cal-card{background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(7,36,63,.06);margin:18px auto;max-width:520px;padding:18px;width:94%}
+  ./* ✅ FIXED Book an Appointment card layout */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(7,36,63,0.08);
+  margin: 18px auto;
+  padding: 22px;
+  max-width: 480px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Match style for the calendar card */
+.cal-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(7,36,63,0.08);
+  margin: 18px auto;
+  padding: 22px;
+  max-width: 480px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ✅ Mobile-friendly adjustments */
+@media (max-width: 480px) {
+  .card, .cal-card {
+    max-width: 340px;
+    width: 90%;
+    padding: 16px;
+  }
+  input, select, textarea {
+    font-size: 14px;
+  }
+  .btn {
+    font-size: 15px;
+    padding: 12px;
+  }
+}
   .cal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   .cal-month{font-weight:700;color:#0b6bcb;font-size:18px}
   .nav-btn{background:linear-gradient(90deg,#2ea0ff,#0b6bcb);color:#fff;border:none;padding:6px 10px;border-radius:10px;cursor:pointer}
