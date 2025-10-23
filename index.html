@@ -1,103 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Esparagoza Dental Hub — Appointment Booking</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 <style>
-  body{margin:0;font-family:"Poppins",sans-serif;background:linear-gradient(135deg,#f7fbff,#eaf6ff,#dff2ff);color:#07243f;padding:18px}
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-  .logo{width:100px;border-radius:12px}
-  .menu-btn{background:none;border:none;font-size:26px;color:#0b6bcb;cursor:pointer}
-  h1{color:#0b6bcb;font-size:20px;font-weight:700;margin:10px 0;text-align:left}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif}
+body{
+  background:linear-gradient(180deg,#e9f4ff 0%,#f4f9ff 100%);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  overflow-x:hidden;
+  position:relative;
+}
+body::before{
+  content:"";
+  position:absolute;
+  top:0;left:0;width:100%;height:100%;
+  background:radial-gradient(circle at top right,rgba(11,107,203,0.15),transparent 60%);
+  pointer-events:none;
+}
+h1{font-size:22px;font-weight:700;color:#0b6bcb;margin:14px 0;text-align:center}
+label{display:block;margin:8px 0 4px;color:#0b6bcb;font-weight:600}
+input,select,textarea{
+  width:100%;padding:10px 12px;
+  border:1px solid #d5e6f7;border-radius:10px;
+  font-size:15px;outline:none;
+}
+button{cursor:pointer;transition:.3s}
+.btn{
+  background:linear-gradient(90deg,#2ea0ff,#0b6bcb);
+  color:#fff;border:none;border-radius:10px;
+  padding:12px 18px;font-weight:600;width:100%;
+}
 
-  /* Cards */
-  .card,.cal-card{background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(7,36,63,0.08);
-    margin:18px auto;padding:22px;max-width:480px;width:calc(100% - 30px);box-sizing:border-box;}
-  @media(max-width:480px){.card,.cal-card{max-width:340px;width:90%;padding:16px}}
+/* ✅ FIXED Book and Calendar Cards */
+.card,.cal-card{
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(7,36,63,0.08);
+  margin:18px auto;
+  padding:22px;
+  max-width:480px;
+  width:92%;             /* prevent overflow */
+  box-sizing:border-box;
+}
+@media(max-width:480px){
+  .card,.cal-card{width:90%;padding:16px;}
+}
 
-  /* Calendar */
-  .cal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  .cal-month{font-weight:700;color:#0b6bcb;font-size:18px}
-  .nav-btn{background:linear-gradient(90deg,#2ea0ff,#0b6bcb);color:#fff;border:none;padding:6px 10px;border-radius:10px;cursor:pointer}
-  .weeknames{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;color:#3b6b90;font-size:12px;text-align:center;margin-bottom:6px}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;width:100%}
-  .day-tile{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#fff;color:#0b6bcb;font-weight:600;cursor:pointer;transition:background .2s;min-width:0;overflow:hidden}
-  .day-tile:hover{background:#eaf6ff}
-  .day-tile.closed{background:#eee;color:#888;cursor:not-allowed}
-  .day-tile.booked{background:#f3f3f3;color:#aaa;cursor:not-allowed}
-  .day-tile.today{outline:2px solid #2ea0ff}
+/* Calendar */
+.cal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cal-month{font-weight:700;color:#0b6bcb;font-size:18px}
+.nav-btn{background:linear-gradient(90deg,#2ea0ff,#0b6bcb);color:#fff;border:none;padding:6px 10px;border-radius:10px}
+.weeknames{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;color:#3b6b90;font-size:12px;text-align:center;margin-bottom:6px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;width:100%}
+.day-tile{
+  aspect-ratio:1/1;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:10px;background:#fff;color:#0b6bcb;font-weight:600;
+  cursor:pointer;transition:background .2s;min-width:0;overflow:hidden;
+}
+.day-tile.today{border:2px solid #0b6bcb}
+.day-tile.closed{background:#e0e0e0;color:#999;cursor:not-allowed}
 
-  label{font-weight:600;color:#0b6bcb;font-size:.9rem;margin-top:8px;display:block}
-  input,select,textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #ccc;margin-bottom:10px;font-size:14px}
-  .btn{padding:12px;border-radius:12px;border:none;background:linear-gradient(90deg,#2ea0ff,#0b6bcb);color:#fff;font-weight:700;cursor:pointer;width:100%}
+/* Slot buttons */
+.slot-btn{padding:10px;border:none;border-radius:8px;margin:4px;background:#e7f1ff;color:#0b6bcb;font-weight:600}
+.slot-btn.selected{background:#0b6bcb;color:#fff}
+.slot-btn.booked{background:#ccc;color:#666;cursor:not-allowed}
 
-  /* Time slots */
-  .slots-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
-  .slot-btn{padding:8px 14px;border-radius:20px;border:2px solid #0b6bcb;background:#fff;color:#0b6bcb;font-weight:600;cursor:pointer;transition:all .25s;}
-  .slot-btn:hover{background:#eaf6ff}
-  .slot-btn.selected{background:linear-gradient(90deg,#2ea0ff,#0b6bcb);color:#fff;border:none}
-  .slot-btn.booked{background:#f3f3f3;color:#999;border-color:#ccc;cursor:not-allowed}
+/* Toasts */
+.toast-wrap{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:1000}
+.toast{background:#0b6bcb;color:#fff;padding:10px 16px;border-radius:8px;margin-top:8px;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+.toast.success{background:#00b386}
+.toast.error{background:#d9534f}
 
-  /* Toasts */
-  .toast-wrap{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:6px;z-index:9999}
-  .toast{background:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 5px 20px rgba(0,0,0,.1);border-left:5px solid #2ea0ff;opacity:0;transition:all .4s}
-  .toast.show{opacity:1;transform:translateY(0)}
-  .toast.success{border-left-color:#23c26b;color:#0d5e33}
-  .toast.error{border-left-color:#ff6b6b;color:#7b2222}
+/* Header with 3-bar menu */
+.header{
+  width:100%;max-width:520px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;
+}
+.logo-title{display:flex;align-items:center;gap:8px;color:#0b6bcb;font-weight:700;font-size:18px}
+#menuBtn{
+  background:none;border:none;font-size:26px;color:#0b6bcb;
+  cursor:pointer;line-height:1;
+}
 
-  /* 🔹 Modal menu */
-  .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);
-    backdrop-filter:blur(3px);display:none;justify-content:center;align-items:center;z-index:10000;}
-  .modal-content{background:#fff;border-radius:18px;max-width:500px;width:90%;max-height:85vh;overflow-y:auto;
-    padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.2);animation:fadeIn .3s ease;position:relative;}
-  @keyframes fadeIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
-  .fade-up{animation:fadeUp .6s ease;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-  .close-btn{position:absolute;top:14px;right:20px;font-size:24px;color:#0b6bcb;background:none;border:none;cursor:pointer}
-  .modal-content h3{text-align:center;color:#0b6bcb;margin-top:10px}
-  .modal-content p,.modal-content li{font-size:14px;line-height:1.5;color:#07243f;margin-bottom:10px;text-align:justify;}
-  .modal-content ul{padding-left:20px;margin:0}
-  .modal-logo{display:block;margin:0 auto 10px auto;width:110px;border-radius:12px;}
-  .menu-options{display:flex;flex-direction:column;gap:10px;margin-top:20px;}
-  .menu-tile{background:rgba(11,107,203,0.15);color:#0b6bcb;border:none;padding:14px;border-radius:10px;
-    font-weight:600;cursor:pointer;transition:all .3s;}
-  .menu-tile:hover{background:rgba(11,107,203,0.25);}
-  .line{height:2px;background:#0b6bcb;width:100%;border-radius:2px;}
+/* 🔹 Modern Modal Overlay */
+.modal-overlay{
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);
+  justify-content:center;align-items:center;z-index:1001;
+}
+.modal-content{
+  background:#fff;border-radius:16px;max-width:420px;width:90%;
+  padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.15);
+  color:#0b6bcb;max-height:80vh;overflow-y:auto;animation:fadeIn .3s ease;
+}
+.close-btn{
+  background:none;border:none;font-size:24px;color:#0b6bcb;
+  position:absolute;top:16px;right:24px;cursor:pointer;
+}
+.menu-options{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.menu-tile{
+  background:rgba(11,107,203,0.15);color:#0b6bcb;border:none;
+  padding:14px;border-radius:10px;font-weight:600;cursor:pointer;
+}
+.menu-tile:hover{background:rgba(11,107,203,0.25)}
+.line{height:2px;background:#0b6bcb;width:100%;border-radius:2px;margin:2px 0}
+.modal-logo{display:block;margin:0 auto 10px;width:80px;height:auto}
+#backBtn{background:none;border:none;color:#0b6bcb;font-weight:700;margin-bottom:10px;cursor:pointer}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-<header>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <img class="logo" src="https://i.imgur.com/t942gBV.png" />
-    <h1>Esparagoza Dental Hub</h1>
+
+<div class="header">
+  <div class="logo-title">
+    <img src="https://i.imgur.com/t942gBV.png" alt="logo" style="height:36px;width:auto;">
+    <span>Esparagoza Dental Hub</span>
   </div>
-  <button class="menu-btn" id="menuBtn">☰</button>
-</header>
+  <button id="menuBtn">&#9776;</button>
+</div>
+
+<h1>Appointment Booking</h1>
 
 <!-- Calendar -->
 <div class="cal-card">
   <div class="cal-top">
-    <button class="nav-btn" id="prevMonth">◀</button>
-    <div class="cal-month" id="monthTitle"></div>
-    <button class="nav-btn" id="nextMonth">▶</button>
+    <button class="nav-btn" id="prevMonth">&#10094;</button>
+    <div class="cal-month" id="monthTitle">October 2025</div>
+    <button class="nav-btn" id="nextMonth">&#10095;</button>
   </div>
-  <div class="weeknames">
-    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-  </div>
+  <div class="weeknames"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
   <div class="cal-grid" id="calGrid"></div>
-  <p style="text-align:center;font-size:13px;color:#486b85;">Closed or fully booked dates are grayed out.</p>
+  <p style="text-align:center;font-size:12px;margin-top:6px;color:#3b6b90">Closed or fully booked dates are grayed out.</p>
 </div>
 
 <!-- Booking Form -->
 <div class="card">
-  <h2>Book an Appointment</h2>
-  <form id="bookingForm" autocomplete="off">
-    <label>Full Name</label><input id="name" required>
-    <label>Email</label><input id="email" type="email" required>
-    <label>Phone</label><input id="phone" type="tel" required>
+  <h2 style="color:#0b6bcb;margin-bottom:10px;">Book an Appointment</h2>
+  <form id="bookingForm">
+    <label>Full Name</label>
+    <input type="text" id="name" placeholder="Enter full name" required>
+
+    <label>Email</label>
+    <input type="email" id="email" placeholder="Enter email" required>
+
+    <label>Phone</label>
+    <input type="text" id="phone" placeholder="Enter phone" required>
+
     <label>Service</label>
     <select id="service" required>
       <option value="">Select Service</option>
@@ -109,24 +168,33 @@
       <option>Oral Surgery</option>
       <option>Orthodontics</option>
     </select>
-    <label>Date</label><input id="date" readonly required placeholder="Select date from calendar">
-    <label>Time</label><input id="time" readonly required placeholder="Select a time slot">
-    <div class="slots-grid" id="slotsGrid"></div>
-    <label>Notes (optional)</label><textarea id="notes" rows="3"></textarea>
+
+    <label>Date</label>
+    <input type="text" id="date" readonly placeholder="Select date from calendar" required>
+
+    <label>Time</label>
+    <input type="text" id="time" readonly placeholder="Select a time slot" required>
+
+    <div id="slotsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin:10px 0;"></div>
+
+    <label>Notes (optional)</label>
+    <textarea id="notes" rows="2" placeholder="Additional notes"></textarea>
+
     <button class="btn" type="submit">Submit Booking</button>
   </form>
 </div>
 
+<!-- Toast -->
 <div class="toast-wrap" id="toastWrap"></div>
 
-<!-- 🔹 Modern Modal -->
+<!-- Modal -->
 <div class="modal-overlay" id="modalOverlay">
-  <div class="modal-content fade-up" id="modalContent">
+  <div class="modal-content" id="modalContent">
     <button class="close-btn" id="closeModal">&times;</button>
 
-    <!-- Menu Selector -->
-    <div id="modalMenu" class="fade-up">
-      <h3>Esparagoza Dental Hub</h3>
+    <!-- Menu -->
+    <div id="modalMenu">
+      <h3 style="text-align:center;">Esparagoza Dental Hub</h3>
       <div class="menu-options">
         <button class="menu-tile" data-section="about">About Us</button>
         <div class="line"></div>
@@ -138,15 +206,15 @@
       </div>
     </div>
 
-    <!-- Section Details -->
+    <!-- Section Content -->
     <div id="sectionContent" style="display:none;">
-      <button id="backBtn" style="background:none;border:none;color:#0b6bcb;font-weight:700;margin-bottom:10px;cursor:pointer;">← Back</button>
+      <button id="backBtn">← Back</button>
       <div id="sectionBody"></div>
     </div>
   </div>
-  </div>
+</div>
 
-  <script type="module">
+  <scriptdivpe="module">
 /* ------------------------- FIREBASE CONFIG ------------------------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, onValue, get, set, push, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
