@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Esparagoza Dental Hub — Book an Appointment</title>
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#f7fbff;
+      --bg2:#eaf6ff;
+      --bg3:#dff2ff;
+      --primary:#0b6bcb;
+      --accent:#2ea0ff;
+      --card-bg: rgba(255,255,255,0.96);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;color:#07243f}
+    body{
+      background: linear-gradient(135deg,var(--bg1), var(--bg2), var(--bg3));
+      padding:18px 12px;
+    }
+
+    .wrap{ max-width:980px; margin:0 auto; display:block; }
+
+    header { text-align:center; margin-bottom:10px;}
+    .logo { width:120px; display:block; margin: 0 auto 8px; border-radius:12px;}
+    h1{ color:var(--primary); font-size:28px; margin:0; font-weight:700; text-align:center;}
+
+    .cal-card {
+      background: var(--card-bg);
+      border-radius:14px;
+      padding:14px;
+      margin:18px auto;
+      width:92%;
+      max-width:520px;
+      box-shadow: 0 12px 40px rgba(7,36,63,0.06);
+    }
+    .cal-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .cal-month { font-weight:700; color:var(--primary); font-size:18px; text-align:center; flex:1; }
+    .nav-btn { background:linear-gradient(90deg,var(--accent),var(--primary)); color:white; border:none; padding:8px 10px; border-radius:10px; cursor:pointer; }
+    .weeknames { display:grid; grid-template-columns: repeat(7, 1fr); gap:6px; color:#3b6b90; font-size:12px; text-align:center; margin-bottom:8px; }
+    .cal-grid { display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; }
+    .day-tile {
+      height:58px; display:flex; align-items:center; justify-content:center;
+      border-radius:10px; cursor:pointer; background:white;
+      box-shadow: 0 6px 16px rgba(34,50,80,0.04); font-weight:700; color:var(--primary);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .day-tile:hover { transform: translateY(-6px); box-shadow:0 12px 28px rgba(34,50,80,0.08); }
+    .day-tile.booked { background:#efefef; color:#9a9a9a; cursor:not-allowed; }
+    .day-tile.closed { background:#f2ecef; color:#b0b0b0; cursor:not-allowed; }
+    .day-tile.today { outline: 2px solid rgba(11,107,203,0.08); }
+
+    .card {
+      background: var(--card-bg);
+      border-radius:14px;
+      padding:20px;
+      margin:18px auto;
+      width:92%;
+      max-width:520px;
+      box-shadow: 0 12px 40px rgba(7,36,63,0.06);
+    }
+    label{ font-weight:600; color:var(--primary); font-size:0.95rem; display:block; margin-bottom:6px; }
+    input, textarea, select {
+      width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(0,0,0,0.06); background:white; font-size:14px; outline:none; margin-bottom:10px;
+    }
+
+    .btn { padding:12px; border-radius:12px; border:none; background:linear-gradient(90deg,var(--accent),var(--primary)); color:white; font-weight:700; cursor:pointer; }
+    .btn.ghost { background:transparent; border:1px solid rgba(0,0,0,0.06); color:var(--primary); }
+
+    .slots-grid { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; justify-content:center; }
+    .slot-btn { padding:12px 16px; border-radius:12px; border:1px solid rgba(0,0,0,0.08); background:white; cursor:pointer; font-weight:700; min-width:120px; text-align:center; }
+    .slot-btn.booked { background:#eee; color:#9a9a9a; cursor:not-allowed; }
+    .slot-btn.selected { background:linear-gradient(90deg,var(--accent),var(--primary)); color:white; border:none; }
+
+    .toast-wrap { position: fixed; right:18px; bottom:18px; z-index:2000; display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+    .toast { background:white; padding:12px 14px; border-radius:10px; box-shadow:0 10px 30px rgba(7,36,63,0.12); border-left:6px solid var(--accent); color:var(--primary); font-weight:700; opacity:0; transition:all .4s ease; }
+    .toast.show { opacity:1; transform:translateY(0); }
+    .toast.success{ border-left-color:#23c26b; color:#0d5e33 }
+    .toast.error{ border-left-color:#ff6b6b; color:#7b2222 }
+
+    @media (max-width:600px){ .card, .cal-card{width:96%;}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img class="logo" src="https://i.imgur.com/t942gBV.png" alt="Esparagoza Dental Hub Logo">
+      <h1>Esparagoza Dental Hub — Appointment Booking</h1>
+    </header>
+
+    <div class="cal-card">
+      <div class="cal-top">
+        <button class="nav-btn" id="prevMonth">◀</button>
+        <div class="cal-month" id="monthTitle"></div>
+        <button class="nav-btn" id="nextMonth">▶</button>
+      </div>
+      <div class="weeknames"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <p style="text-align:center;font-size:13px;color:#486b85;">Closed or fully-booked dates are grayed out.</p>
+    </div>
+
+    <div class="card">
+      <h2>Book an Appointment</h2>
+      <form id="bookingForm" autocomplete="off">
+        <label>Full name</label>
+        <input id="name" required placeholder="Your full name">
+        <label>Email address</label>
+        <input id="email" type="email" required placeholder="you@example.com">
+        <label>Phone</label>
+        <input id="phone" type="tel" required placeholder="+63xxxxxxxxxx">
+        <label>Service</label>
+        <select id="service" required>
+          <option value="">Select service</option>
+          <option>Dental Cleaning</option>
+          <option>Tooth Extraction</option>
+          <option>Orthodontics (Braces)</option>
+          <option>Root Canal Treatment</option>
+          <option>Dental Filling</option>
+          <option>Prosthodontics (Crowns/Bridges)</option>
+          <option>Teeth Whitening</option>
+          <option>Others</option>
+        </select>
+        <div id="otherWrap" style="display:none;">
+          <label>Specify Service</label>
+          <input id="otherText" placeholder="Please specify">
+        </div>
+        <label>Date</label>
+        <input id="date" readonly required placeholder="Select a date from calendar">
+        <label>Time</label>
+        <input id="time" readonly required placeholder="Select time slot">
+        <div class="slots-grid" id="slotsGrid"></div>
+        <label>Notes (optional)</label>
+        <textarea id="notes" rows="3"></textarea>
+        <button class="btn" type="submit">Submit Booking</button>
+      </form>
+    </div>
+    <div class="toast-wrap" id="toastWrap"></div>
+  </div>
+
+  <script type="module">
+/* ----------------------------
+   Firebase Configuration
+----------------------------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, onValue, get, set, push, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCV39b2CkzS_tt75SVXa6z95s6f4qVlfLg",
+  authDomain: "esparagozadentalclinic-6a744.firebaseapp.com",
+  databaseURL: "https://esparagozadentalclinic-6a744-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "esparagozadentalclinic-6a744",
+  storageBucket: "esparagozadentalclinic-6a744.firebasestorage.app",
+  messagingSenderId: "959639046373",
+  appId: "1:959639046373:web:ccf39df13d94e527fcec0c",
+  measurementId: "G-KZT5J1LHHQ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// EmailJS setup
+emailjs.init("xvStFrKI-3M-3ZCvz");
+
+// Utility
+const calGrid=document.getElementById('calGrid'),monthTitle=document.getElementById('monthTitle'),toastWrap=document.getElementById('toastWrap');
+const dateInput=document.getElementById('date'),timeInput=document.getElementById('time'),slotsGrid=document.getElementById('slotsGrid');
+let displayedYear,displayedMonth,closedDates={},slotCounts={},maxSlots=1;
+
+const TIME_SLOTS=["8:00 AM - 9:00 AM","9:00 AM - 10:00 AM","10:00 AM - 11:00 AM","11:00 AM - 12:00 NN","1:00 PM - 2:00 PM","2:00 PM - 3:00 PM","3:00 PM - 4:00 PM","4:00 PM - 5:00 PM"];
+function formatDateKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function slotKey(s){return s.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();}
+function showToast(m,t='info'){const n=document.createElement('div');n.className='toast';if(t==='success')n.classList.add('success');if(t==='error')n.classList.add('error');n.textContent=m;toastWrap.appendChild(n);setTimeout(()=>n.classList.add('show'),50);setTimeout(()=>n.remove(),3000);}
+
+onValue(ref(db,'closed_dates'),s=>{closedDates=s.exists()?s.val():{};renderCal(displayedYear,displayedMonth);});
+onValue(ref(db,'settings/maxSlots'),s=>{maxSlots=s.exists()?s.val():1;});
+onValue(ref(db,'slot_counts'),s=>{slotCounts=s.exists()?s.val():{};renderCal(displayedYear,displayedMonth);});
+
+function renderCal(y,m){
+ const now=new Date();if(!y||!m){y=now.getFullYear();m=now.getMonth();}
+ displayedYear=y;displayedMonth=m;const first=new Date(y,m,1),start=new Date(y,m,1-start.getDay());
+ monthTitle.textContent=first.toLocaleString('default',{month:'long',year:'numeric'});
+ calGrid.innerHTML='';
+ for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=formatDateKey(d),tile=document.createElement('div');
+ tile.className='day-tile';tile.textContent=d.getDate();
+ if(d.getMonth()!==m)tile.style.visibility='hidden';
+ else if(closedDates[iso]){tile.classList.add('closed');}
+ else if(d<new Date().setHours(0,0,0,0)){tile.style.opacity=.4;tile.style.cursor='not-allowed';}
+ else{tile.onclick=()=>{dateInput.value=iso;loadSlots(iso);};}
+ const today=new Date();today.setHours(0,0,0,0);if(d.getTime()===today.getTime())tile.classList.add('today');
+ calGrid.appendChild(tile);}
+}
+renderCal();
+
+async function loadSlots(dateKey){
+ slotsGrid.innerHTML='';
+ const countsSnap=await get(ref(db,`slot_counts/${dateKey}`));
+ const counts=countsSnap.exists()?countsSnap.val():{};
+ TIME_SLOTS.forEach(slot=>{
+  const k=slotKey(slot);const c=counts[k]||0;const full=c>=maxSlots;
+  const btn=document.createElement('button');btn.className='slot-btn';btn.textContent=slot+(full?' • FULL':'');
+  if(full)btn.classList.add('booked');else btn.onclick=()=>{timeInput.value=slot;document.querySelectorAll('.slot-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');};
+  slotsGrid.appendChild(btn);
+ });
+}
+
+document.getElementById('bookingForm').onsubmit=async e=>{
+ e.preventDefault();
+ const name=nameInput.value,email=email.value,phone=phone.value,service=document.getElementById('service').value,date=dateInput.value,time=timeInput.value,notes=notes.value;
+ if(!name||!email||!phone||!service||!date||!time)return showToast('Complete all fields','error');
+ const sKey=slotKey(time),slotRef=ref(db,`slot_counts/${date}/${sKey}`);
+ const tx=await runTransaction(slotRef,c=>{if(!c)c=0;if(c>=maxSlots)return;c+1});
+ if(!tx.committed)return showToast('Slot already full','error');
+ const booking={name,email,phone,service,date,time,notes,timestamp:Date.now()};
+ await set(push(ref(db,`appointments/${date}/${sKey}`)),booking);
+ await emailjs.send("service_qtacvtn","template_edmr2cm",{to_email:email,user_name:name,appointment_service:service,appointment_date:date,appointment_time:time});
+ showToast('Appointment booked successfully!','success');e.target.reset();slotsGrid.innerHTML='';
+};
+
+/* --------- Firebase Structure JSON (for reference/import) --------- */
+window.firebaseStructure = {
+ "settings":{"maxSlots":1},
+ "closed_dates":{"2025-12-25":true},
+ "appointments":{},
+ "slot_counts":{},
+ "slot_full":{},
+ "date_full":{}
+};
+</script>
+</body>
+</html>
