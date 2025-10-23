@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "maxSlots": 1
+  },
+  "closed_dates": {
+    "2025-12-25": true
+  },
+  "appointments": {},
+  "slot_counts": {},
+  "slot_full": {},
+  "date_full": {}
+}
