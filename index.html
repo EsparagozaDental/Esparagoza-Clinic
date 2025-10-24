@@ -347,6 +347,11 @@ document.getElementById("bookingForm").onsubmit = async e => {
   }
 };
 
+// 🔹 Prevent accidental form submit when pressing Enter in inputs
+document.getElementById("bookingForm").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") e.preventDefault();
+});
+
 /* ==== Modal & Menu ==== */
 const overlay = document.getElementById("modalOverlay");
 const menu = document.getElementById("modalMenu");
