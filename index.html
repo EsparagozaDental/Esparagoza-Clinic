@@ -230,7 +230,7 @@ input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d5e6f7;bord
         <label>Time</label><input type="text" id="time" readonly required>
         <div id="slotsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin:10px 0;"></div>
         <label>Notes (optional)</label><textarea id="notes" rows="2"></textarea>
-        <button class="btn-primary" type="submit">Submit Booking</button>
+        <button class="btn-primary" type="button" id="submitBookingBtn">Submit Booking</button>
       </form>
     </section>
   </main>
@@ -332,23 +332,43 @@ input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d5e6f7;bord
       });
     }
 
-    const nameEl=el("name"),emailEl=el("email"),phoneEl=el("phone"),serviceEl=el("service"),notesEl=el("notes");
-    el("bookingForm").onsubmit=async e=>{
-      e.preventDefault();
-      const name=nameEl.value.trim(),email=emailEl.value.trim(),phone=phoneEl.value.trim(),
-            notes=notesEl.value.trim(),service=serviceEl.value,date=dateInput.value,time=timeInput.value;
-      if(!date||!time)return showToast("Select date & time!","error");
-      const key=slotKey(time),slotRef=ref(db,`slot_counts/${date}/${key}`);
-      try{
-        const booked=await runTransaction(slotRef,c=>(c||0)+1);
-        if(booked.snapshot.val()>maxSlots){showToast("Time slot full!","error");return;}
-        const newRef=push(ref(db,"bookings"));
-        await set(newRef,{name,email,phone,service,date,time,notes,createdAt:new Date().toISOString()});
-        sendEmail("template_td348he",{name,email,phone,service,date,time,notes});
-        showToast("Booking successful!","success");
-        e.target.reset();timeInput.value="";renderCalendar(displayedYear,displayedMonth);
-      }catch(err){console.error(err);showToast("Booking failed!","error");}
-    };
+    // Prevent Enter key auto-submit
+el("bookingForm").addEventListener("keydown", e => {
+  if (e.key === "Enter") e.preventDefault();
+});
+
+// Trigger only when actual Submit button is clicked
+el("submitBookingBtn").onclick = async e => {
+  e.preventDefault();
+  const name=nameEl.value.trim(),
+        email=emailEl.value.trim(),
+        phone=phoneEl.value.trim(),
+        notes=notesEl.value.trim(),
+        service=serviceEl.value,
+        date=dateInput.value,
+        time=timeInput.value;
+
+  if(!date || !time) return showToast("Select date & time!","error");
+  const key=slotKey(time);
+  const slotRef=ref(db,`slot_counts/${date}/${key}`);
+
+  try {
+    const booked=await runTransaction(slotRef,count=>(count||0)+1);
+    if(booked.snapshot.val()>maxSlots){
+      showToast("Time slot full!","error");return;
+    }
+    const newRef=push(ref(db,"bookings"));
+    await set(newRef,{name,email,phone,service,date,time,notes,createdAt:new Date().toISOString()});
+    sendEmail("template_td348he",{name,email,phone,service,date,time,notes});
+    showToast("Booking successful!","success");
+    el("bookingForm").reset();
+    timeInput.value="";
+    renderCalendar(displayedYear,displayedMonth);
+  } catch(err){
+    console.error(err);
+    showToast("Booking failed!","error");
+  }
+};
 
     toBookingBtn.onclick=()=>{frontPage.classList.add("fadeOut");setTimeout(()=>bookingPage.classList.add("show"),400);};
 
