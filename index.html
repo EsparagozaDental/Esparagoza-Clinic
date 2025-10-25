@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Esparagoza Dental Hub</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <style>
 :root{
@@ -13,7 +13,9 @@
   --success:#00b386;
   --danger:#d9534f;
   --card-bg:#ffffff;
-  --muted:#999;
+  --muted:#758aa2;
+  --hero-height:80vh;
+  --max-protocol-height:320px;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;scroll-behavior:smooth}
 html,body{height:100%}
@@ -21,74 +23,126 @@ body{
   background:linear-gradient(180deg,#e9f4ff 0%,#f4f9ff 100%);
   min-height:100vh;overflow-x:hidden;color:var(--brand);
 }
-.app{position:relative;min-height:100vh;display:flex;align-items:stretch;justify-content:center}
+/* APP LAYOUT */
+.app{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:stretch;}
 
-/* FRONT PAGE */
-#frontPage{
-  position:fixed;inset:0;
-  background-image:url('https://i.imgur.com/EHVhWYb.jpeg');
-  background-size:cover;background-position:center;
-  display:flex;align-items:center;justify-content:center;
-  z-index:40;opacity:1;transform:scale(1);
-  transition:opacity .7s ease,transform .7s ease;
+/* FRONT HERO (desktop only layout) */
+.hero{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:28px;
+  padding:28px;
+  min-height:var(--hero-height);
+  max-height:calc(var(--hero-height) + 60px);
 }
-#frontPage.fadeOut{opacity:0;pointer-events:none;transform:scale(1.03)}
-.front-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(255,255,255,.08));backdrop-filter:blur(1px)}
-.front-inner{
-  position:relative;z-index:2;max-width:920px;width:92%;text-align:center;
-  padding:36px;border-radius:14px;color:#fff;
-  display:flex;flex-direction:column;align-items:center;gap:12px;
+
+/* Left: fading slideshow */
+.slider-side{
+  width:36%;
+  min-width:320px;
+  max-width:520px;
+  height:calc(var(--hero-height) - 40px);
+  position:relative;
+  overflow:hidden;
+  border-radius:12px;
+  box-shadow:0 12px 40px rgba(7,36,63,.12);
 }
-.logo-big{width:140px;height:auto;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
-.welcome{font-size:28px;font-weight:700;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.4)}
-.muted-white{color:rgba(255,255,255,.9);font-weight:600}
-.meta-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center}
-.pill{background:rgba(255,255,255,.12);padding:10px 14px;border-radius:999px;font-weight:700;color:#fff}
-.status-in{background:linear-gradient(90deg,#67e3a1,#00b386);color:#053017}
-.status-out{background:linear-gradient(90deg,#ffdede,#ff8a8a);color:#4a0b0b}
-.cta-btn{margin-top:12px;padding:14px 22px;border-radius:12px;border:none;font-weight:700;
-  background:linear-gradient(90deg,var(--accent),var(--brand));color:#fff;cursor:pointer;
-  box-shadow:0 8px 26px rgba(11,107,203,.24);transition:transform .16s ease}
-.cta-btn:active{transform:translateY(1px) scale(.997)}
+.slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity .9s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.slide img{width:100%;height:100%;object-fit:cover;display:block}
+.slide.show{opacity:1;z-index:2}
 
-/* NAVIGATION */
-.front-top{position:absolute;top:16px;right:16px;z-index:60;display:flex;align-items:center;gap:10px}
-.nav-links{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.06);padding:8px;border-radius:10px}
-.menu-btn{background:linear-gradient(90deg,var(--accent),var(--brand));color:#fff;border:none;padding:8px 10px;border-radius:10px;font-size:18px;cursor:pointer}
-@media(max-width:900px){.nav-links{display:none}.menu-btn{display:inline-flex}}
-@media(min-width:901px){.menu-btn{display:none}.nav-links{display:flex}}
+/* nav arrows on slider */
+.slider-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:10;
+  background:rgba(255,255,255,.82);border:none;padding:8px 10px;border-radius:8px;cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,.15)
+}
+.slider-arrow.left{left:10px}
+.slider-arrow.right{right:10px}
 
-/* Frosted dropdown */
+/* Center: welcome, big logo, CTA */
+.center-side{
+  width:28%;
+  min-width:320px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+.logo-big{width:190px;height:auto;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.16)}
+.welcome{font-size:28px;font-weight:700;color:var(--brand)}
+.hero-sub{color:var(--muted);font-size:14px;max-width:340px}
+
+/* Right: video */
+.video-side{
+  width:36%;
+  min-width:320px;
+  max-width:520px;
+  height:calc(var(--hero-height) - 40px);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:12px;
+  box-shadow:0 12px 40px rgba(0,0,0,.12);
+}
+.video-side video{width:100%;height:100%;object-fit:cover;display:block}
+
+/* FRONT TOP NAV moved to left */
+.front-top{position:absolute;top:18px;left:18px;z-index:200;display:flex;align-items:center;gap:10px}
+.nav-links{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.06);padding:8px;border-radius:10px}
+.menu-btn{display:none}
+@media(max-width:900px){
+  .nav-links{display:none}
+  .menu-btn{display:inline-flex;background:linear-gradient(90deg,var(--accent),var(--brand));color:#fff;border:none;padding:8px 10px;border-radius:10px;font-size:18px;cursor:pointer}
+}
+
+/* Frosted dropdown (desktop) */
 .nav-item{position:relative;padding:6px 12px;cursor:pointer;color:#fff;font-weight:700}
-.nav-item:hover{background:rgba(255,255,255,.08)}
+.nav-item:hover{background:rgba(255,255,255,.06)}
 .dropdown{
-  display:none;position:absolute;top:110%;left:50%;
-  transform:translateX(-50%) translateY(-6px);
-  background:rgba(255,255,255,.82);backdrop-filter:blur(10px);
-  color:var(--brand);border-radius:0;padding:14px 18px;
-  min-width:240px;box-shadow:0 6px 18px rgba(0,0,0,.25);
-  text-align:left;opacity:0;pointer-events:none;
+  display:none;position:absolute;top:110%;left:0;
+  transform:translateY(6px);
+  background:rgba(255,255,255,.88);backdrop-filter:blur(8px);
+  color:var(--brand);border-radius:0;padding:12px 14px;
+  min-width:320px;max-width:420px;box-shadow:0 12px 36px rgba(0,0,0,.14);
+  text-align:left;opacity:0;pointer-events:none;z-index:300;
 }
-.nav-item:last-child .dropdown{
-  right:0;
-  left:auto;
-  transform:translateY(-2px);
-  text-align:left;
-  margin-top:4px;
+/* show dropdown */
+.nav-item:hover .dropdown{display:block;opacity:1;pointer-events:all;transform:translateY(0);transition:opacity .28s,transform .28s}
+
+/* Scrollable Protocols dropdown */
+.dropdown .protocol-scroll{
+  max-height: var(--max-protocol-height);
+  overflow:auto;
+  padding-right:8px;
 }
-.nav-item:hover .dropdown{display:block;animation:dropdownSlide .3s ease forwards;pointer-events:all}
-@keyframes dropdownSlide{from{opacity:0;transform:translateX(-50%) translateY(-10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
-.dropdown h4{font-size:15px;font-weight:700;margin-bottom:6px;border-bottom:1px solid #d0e2f5;padding-bottom:3px}
-.dropdown p,.dropdown li{font-size:13px;line-height:1.5;margin:3px 0}
-@media(max-width:900px){.nav-item .dropdown{display:none!important}}
+/* style scrollbar lightly */
+.dropdown .protocol-scroll::-webkit-scrollbar{width:8px}
+.dropdown .protocol-scroll::-webkit-scrollbar-thumb{background:rgba(11,107,203,.12);border-radius:6px}
+
+/* headings & content inside dropdowns */
+.dropdown h4{font-size:15px;font-weight:700;margin-bottom:8px;border-bottom:1px solid #dfeefb;padding-bottom:6px}
+.dropdown p,.dropdown li{font-size:13px;line-height:1.5;margin:6px 0;color:#234a6b}
+.dropdown ul{padding-left:14px;margin-top:6px}
+
+/* rightmost (contact) alignment fix */
+.nav-item.contact .dropdown{left:auto;right:0;transform:translateY(6px)}
 
 /* BOOKING PAGE */
-#bookingPage{opacity:0;transform:translateY(12px);transition:opacity .7s ease,transform .7s ease;max-width:980px;width:100%;padding:28px 20px;margin:36px auto 80px}
+#bookingPage{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease;max-width:1100px;width:100%;padding:28px 20px;margin:36px auto 80px}
 #bookingPage.show{opacity:1;transform:translateY(0)}
-.book-logo{display:block;margin:0 auto 10px auto;width:100px}
-.card{background:var(--card-bg);border-radius:16px;box-shadow:0 10px 30px rgba(7,36,63,.08);padding:22px;margin:18px auto;max-width:520px}
+.book-logo{display:block;margin:0 auto 10px auto;width:150px}
+.card{background:var(--card-bg);border-radius:16px;box-shadow:0 10px 30px rgba(7,36,63,.08);padding:22px;margin:18px auto;max-width:680px}
 label{display:block;margin:8px 0 4px;color:var(--brand);font-weight:600}
-input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d5e6f7;border-radius:10px;font-size:15px;outline:none}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #dbe9fb;border-radius:10px;font-size:15px;outline:none}
 .btn-primary{cursor:pointer;transition:.3s;background:linear-gradient(90deg,var(--accent),var(--brand));color:#fff;border:none;border-radius:10px;padding:12px 18px;font-weight:700;width:100%}
 .weeknames{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;color:#3b6b90;font-size:12px;text-align:center;margin-bottom:6px}
 .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;width:100%}
@@ -99,63 +153,79 @@ input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d5e6f7;bord
 .slot-btn{padding:10px;border:none;border-radius:8px;margin:4px;background:#e7f1ff;color:var(--brand);font-weight:600;transition:all .2s}
 .slot-btn.selected{background:var(--brand);color:#fff}
 .slot-btn.booked{background:#ccc;color:#666;cursor:not-allowed}
-.toast-wrap{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:1000}
+
+/* toast + modal */
+.toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:10000}
 .toast{background:var(--brand);color:#fff;padding:10px 16px;border-radius:8px;margin-top:8px;opacity:0;transition:opacity .3s}
 .toast.show{opacity:1}
 .toast.success{background:var(--success)}
 .toast.error{background:var(--danger)}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);justify-content:center;align-items:center;z-index:1001;opacity:0;transition:opacity .5s ease}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);justify-content:center;align-items:center;z-index:10001;opacity:0;transition:opacity .35s ease}
 .modal-overlay.show{display:flex;opacity:1}
-.modal-content{background:#fff;border-radius:16px;max-width:420px;width:90%;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.15);color:var(--brand);max-height:80vh;overflow-y:auto;animation:fadeIn .5s ease}
-@keyframes fadeIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
-.close-btn{position:absolute;top:12px;right:16px;background:var(--brand);color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;font-weight:bold;cursor:pointer}
-.fade-section{animation:fadeIn .5s ease}
+.modal-content{background:#fff;border-radius:14px;max-width:520px;width:92%;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.16);color:var(--brand);max-height:78vh;overflow-y:auto}
+.close-btn{position:absolute;top:12px;right:16px;background:var(--brand);color:#fff;border:none;border-radius:50%;width:34px;height:34px;font-size:18px;font-weight:bold;cursor:pointer}
+
+/* responsive behavior */
+@media(max-width:1200px){
+  .hero{gap:18px;padding:18px}
+  .slider-side,.video-side,.center-side{min-width:280px}
+  .center-side{width:34%}
+  .slider-side{width:33%}
+  .video-side{width:33%}
+}
+@media(max-width:900px){
+  /* On mobile: stack hero vertically and hide video + slider to keep welcome simple */
+  .hero{flex-direction:column;min-height:auto;padding:20px;height:auto}
+  .slider-side,.video-side{display:none}
+  .center-side{width:100%;min-width:auto;padding:18px}
+  .front-top{left:12px;top:12px}
+  .modal-content{max-width:92%}
+}
+/* small tweaks */
+a{color:inherit;text-decoration:none}
 </style>
-</head>
+  </head>
 
   <body>
 <div class="app">
 
-  <!-- FRONT PAGE -->
-  <section id="frontPage">
-    <div class="front-overlay"></div>
-    <div class="front-top">
-      <!-- Desktop Dropdown Navigation -->
-      <nav class="nav-links" id="desktopNav">
-        <div class="nav-item">
-          <span>About Us</span>
-          <div class="dropdown">
-            <p><b>Orthodontics, Implant & General Dentistry</b></p>
-            <p>Dr. Jeff Esparagoza provides quality dental care in Kidapawan City.</p>
-          </div>
+  <!-- FRONT TOP: moved to left (desktop) -->
+  <div class="front-top">
+    <nav class="nav-links" id="desktopNav">
+      <div class="nav-item"><span>About Us</span>
+        <div class="dropdown">
+          <h4>About Us</h4>
+          <p><b>Orthodontics, Implant & General Dentistry</b></p>
+          <p>Dr. Jeff Esparagoza provides quality dental care in Kidapawan City.</p>
         </div>
+      </div>
 
-        <div class="nav-item">
-          <span>Services</span>
-          <div class="dropdown">
-            <ul style="list-style:none;padding:0;margin:0;">
-              <li>Pediatric Dentistry</li>
-              <li>Restorative Dentistry</li>
-              <li>Prosthodontics</li>
-              <li>Veneers & Dental Crown</li>
-              <li>Cosmetic Dentistry</li>
-              <li>Oral Surgery</li>
-              <li>Orthodontics</li>
-            </ul>
-          </div>
+      <div class="nav-item"><span>Services</span>
+        <div class="dropdown">
+          <h4>Services</h4>
+          <ul>
+            <li>Pediatric Dentistry</li>
+            <li>Restorative Dentistry</li>
+            <li>Prosthodontics</li>
+            <li>Veneers & Dental Crown</li>
+            <li>Cosmetic Dentistry</li>
+            <li>Oral Surgery</li>
+            <li>Orthodontics</li>
+          </ul>
         </div>
+      </div>
 
-        <div class="nav-item">
-          <span>Protocols</span>
-          <div class="dropdown">
-            <h4>COVID-19 Dental Practice Protocols</h4>
+      <div class="nav-item"><span>Protocols</span>
+        <div class="dropdown">
+          <h4>COVID-19 Dental Practice Protocols</h4>
+          <div class="protocol-scroll">
             <p><b>CORONAVIRUS DISEASE 2019 (COVID-19)</b> is an infectious disease caused by severe acute respiratory syndrome coronavirus-2 (SARS-CoV-2).</p>
             <p>Common symptoms include fever, cough, fatigue, shortness of breath, and loss of smell.</p>
             <p>The <b>Centers for Disease Control and Prevention (CDCP)</b> says it is primarily spread during close contact and by small droplets produced when people cough, sneeze, or talk — with close contact being within approximately 1–2 meters (3–7 ft).</p>
             <p>The definition shows that the <b>Dental Workforce</b> is at <b>HIGH RISK</b> to contract the said disease. We have created <b>PROTOCOLS</b> in which everyone <b>MUST FOLLOW</b>.</p>
 
             <h4 style="margin-top:10px;">General Instructions</h4>
-            <ul style="list-style:none;margin:0;padding:0;line-height:1.6;">
+            <ul>
               <li>NO MASK, NO ENTRY</li>
               <li>OBSERVE SOCIAL DISTANCING</li>
               <li>ALCOHOL IS AVAILABLE FOR PATIENT'S USE</li>
@@ -163,36 +233,54 @@ input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d5e6f7;bord
               <li>We discourage bringing companions EXCEPT for minor and elder persons</li>
             </ul>
 
-            <h4 style="margin-top:12px;">Schedules / Appointments</h4>
+            <h4 style="margin-top:10px;">Schedules / Appointments</h4>
             <p>New Clinic Hours: <b>Monday to Saturday</b><br>9:00 AM – 4:00 PM</p>
             <p>Clinic Schedule is now <b>STRICTLY BY APPOINTMENT</b>.</p>
             <p>Reschedule your appointment if you have fever or are not feeling well.</p>
           </div>
         </div>
+      </div>
 
-        <div class="nav-item">
-          <span>Contact</span>
-          <div class="dropdown">
-            <h4 style="margin-bottom:6px;">Contact Us</h4>
-            <div style="line-height:1.5;margin-top:2px;">
-              <p style="margin:2px 0;">📍 Kidapawan City, North Cotabato, Philippines</p>
-              <p style="margin:2px 0;">📞 0977 780 9537</p>
-              <p style="margin:2px 0;">📧 esparagoza.jeffrey@gmail.com</p>
-            </div>
-          </div>
+      <div class="nav-item contact"><span>Contact</span>
+        <div class="dropdown">
+          <h4>Contact Us</h4>
+          <p style="margin:6px 0;">📍 Kidapawan City, North Cotabato, Philippines</p>
+          <p style="margin:6px 0;">📞 0977 780 9537</p>
+          <p style="margin:6px 0;">📧 esparagoza.jeffrey@gmail.com</p>
         </div>
-      </nav>
-      <button class="menu-btn" id="menuBtn">&#9776;</button>
+      </div>
+    </nav>
+
+    <!-- Mobile menu button -->
+    <button class="menu-btn" id="menuBtn">&#9776;</button>
+  </div>
+
+  <!-- HERO: slider left, welcome center, video right -->
+  <section class="hero" id="frontPage">
+    <div class="slider-side" id="sliderSide">
+      <!-- arrows -->
+      <button class="slider-arrow left" id="prevSlide">&#10094;</button>
+      <button class="slider-arrow right" id="nextSlide">&#10095;</button>
+
+      <!-- slides (placeholders) -->
+      <div class="slide show"><img src="https://images.unsplash.com/photo-1544745510-7f5f0d3b0b16?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=3a9d6e3e45dbe0e1f6a2b3f8d9bc7c6a" alt="slide1"></div>
+      <div class="slide"><img src="https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=fd9b0b4e1b1f3dc9b7c6e2b8f3b6c9d2" alt="slide2"></div>
+      <div class="slide"><img src="https://images.unsplash.com/photo-1511216210891-34a7b3b6acb7?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=6c4e3a4a6b7f2a9e8c3f1e7b4c9a2d3f" alt="slide3"></div>
     </div>
 
-    <div class="front-inner">
+    <div class="center-side">
       <img src="https://i.imgur.com/t942gBV.png" class="logo-big" alt="logo">
       <div class="welcome">Welcome to Esparagoza Dental Clinic</div>
-      <div class="meta-row">
-        <div class="pill muted-white" id="todayDate">Today</div>
-        <div class="pill muted-white" id="dentistStatus">Dentist: ...</div>
-      </div>
-      <button class="cta-btn" id="toBookingBtn">Make an Appointment</button>
+      <div class="hero-sub">Orthodontics • Implant • General Dentistry — Kidapawan City</div>
+      <button class="cta-btn" id="toBookingBtn" style="width:65%;margin-top:10px">Make an Appointment</button>
+    </div>
+
+    <div class="video-side">
+      <!-- placeholder looping video (public domain sample) -->
+      <video id="heroVideo" autoplay muted loop playsinline>
+        <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
     </div>
   </section>
 
@@ -205,14 +293,10 @@ input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d5e6f7;bord
         <div style="font-weight:700;color:var(--brand);font-size:18px" id="monthTitle">Month</div>
         <button class="btn-primary" id="nextMonth" style="width:48px">&#10095;</button>
       </div>
-      <div class="weeknames">
-        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div>
-        <div>Thu</div><div>Fri</div><div>Sat</div>
-      </div>
+
+      <div class="weeknames"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
       <div class="cal-grid" id="calGrid"></div>
-      <p style="text-align:center;font-size:12px;margin-top:6px;color:#3b6b90">
-        Closed or fully booked dates are grayed out.
-      </p>
+      <p style="text-align:center;font-size:12px;margin-top:6px;color:#3b6b90">Closed or fully booked dates are grayed out.</p>
     </div>
 
     <section class="card" id="bookingFormSection">
@@ -243,7 +327,7 @@ input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d5e6f7;bord
 
   <div class="toast-wrap" id="toastWrap"></div>
 
-  <!-- MODAL -->
+  <!-- MODAL for mobile menu -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-content">
       <button class="close-btn" id="closeModal">&times;</button>
@@ -251,12 +335,12 @@ input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d5e6f7;bord
     </div>
   </div>
 
-  <!-- SCRIPT -->
+  <!-- SCRIPT: firebase, calendar, booking logic, slideshow, menu -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, onValue, get, set, push, runTransaction }
-      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getDatabase, ref, onValue, get, set, push, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
+    /* ====== Firebase config (unchanged) ====== */
     const firebaseConfig = {
       apiKey:"AIzaSyCV39b2CkzS_tt75SVXa6z95s6f4qVlfLg",
       authDomain:"esparagozadentalclinic-6a744.firebaseapp.com",
@@ -269,176 +353,208 @@ input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d5e6f7;bord
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const el=id=>document.getElementById(id);
-    const frontPage=el("frontPage"),toBookingBtn=el("toBookingBtn"),bookingPage=el("bookingPage"),
-          calGrid=el("calGrid"),prevMonth=el("prevMonth"),nextMonth=el("nextMonth"),
-          monthTitle=el("monthTitle"),dateInput=el("date"),timeInput=el("time"),
-          slotsGrid=el("slotsGrid"),toastWrap=el("toastWrap"),todayDate=el("todayDate"),
-          dentistStatusEl=el("dentistStatus"),modalOverlay=el("modalOverlay"),
-          closeModal=el("closeModal"),sectionContent=el("sectionContent"),menuBtn=el("menuBtn");
+    /* ====== DOM helpers ====== */
+    const el = id => document.getElementById(id);
+    const frontPage = el("frontPage"), toBookingBtn = el("toBookingBtn"), bookingPage = el("bookingPage");
+    const calGrid = el("calGrid"), prevMonth = el("prevMonth"), nextMonth = el("nextMonth"), monthTitle = el("monthTitle");
+    const dateInput = el("date"), timeInput = el("time"), slotsGrid = el("slotsGrid");
+    const toastWrap = el("toastWrap"), todayDate = el("todayDate"), dentistStatusEl = el("dentistStatus");
+    const modalOverlay = el("modalOverlay"), closeModal = el("closeModal"), sectionContent = el("sectionContent");
+    const menuBtn = el("menuBtn");
 
-    let displayedYear,displayedMonth,closedDates={},slotCounts={},maxSlots=1;
-    const TIME_SLOTS=["9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 NN","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM"];
-    const fmt=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-    const slotKey=s=>s.replace(/[^a-zA-Z0-9]/g,"_").toLowerCase();
+    /* ====== App state ====== */
+    let displayedYear, displayedMonth;
+    let closedDates = {}, slotCounts = {}, maxSlots = 1;
+    const TIME_SLOTS = ["9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 NN","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM"];
+    const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const slotKey = s => s.replace(/[^a-zA-Z0-9]/g,"_").toLowerCase();
 
+    /* ====== Toast ====== */
     function showToast(msg,type="info"){
-      const e=document.createElement("div");
-      e.className=`toast ${type}`;e.textContent=msg;
-      toastWrap.appendChild(e);
-      setTimeout(()=>e.classList.add("show"),100);
-      setTimeout(()=>e.remove(),3000);
+      const e = document.createElement("div"); e.className = `toast ${type}`; e.textContent = msg;
+      toastWrap.appendChild(e); setTimeout(()=>e.classList.add("show"),100); setTimeout(()=>e.remove(),3000);
     }
 
-    onValue(ref(db,"closed_dates"),s=>{closedDates=s.exists()?s.val():{};renderCalendar();});
-    onValue(ref(db,"settings/maxSlots"),s=>{maxSlots=s.exists()?s.val():1;});
-    onValue(ref(db,"slot_counts"),s=>{slotCounts=s.exists()?s.val():{};renderCalendar();});
-    onValue(ref(db,"dentist_status"),s=>{
-      const v=s.exists()?String(s.val()).toUpperCase():"OUT";
-      dentistStatusEl.textContent=`Dentist: ${v}`;
-      dentistStatusEl.classList.toggle("status-in",v==="IN");
-      dentistStatusEl.classList.toggle("status-out",v!=="IN");
+    /* ====== Firebase listeners ====== */
+    onValue(ref(db,"closed_dates"), s => { closedDates = s.exists()?s.val():{}; renderCalendar(); });
+    onValue(ref(db,"settings/maxSlots"), s => { maxSlots = s.exists()?s.val():1; });
+    onValue(ref(db,"slot_counts"), s => { slotCounts = s.exists()?s.val():{}; renderCalendar(); });
+    onValue(ref(db,"dentist_status"), s => {
+      const v = s.exists()?String(s.val()).toUpperCase():"OUT";
+      if (dentistStatusEl) {
+        dentistStatusEl.textContent = `Dentist: ${v}`;
+        dentistStatusEl.classList.toggle("status-in", v==="IN");
+        dentistStatusEl.classList.toggle("status-out", v!=="IN");
+      }
     });
-    todayDate.textContent=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+    if (todayDate) todayDate.textContent = new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"});
 
+    /* ====== EmailJS send ====== */
     function sendEmail(tid,data){
-      emailjs.init("cVyQCkIy0P6hPyKrH");
-      return emailjs.send("service_7k6q958",tid,data)
-        .then(()=>showToast("Confirmation email sent!","success"))
-        .catch(()=>showToast("Email not sent.","error"));
+      try{
+        emailjs.init("cVyQCkIy0P6hPyKrH");
+        return emailjs.send("service_7k6q958",tid,data).then(()=>showToast("Confirmation email sent!","success")).catch(()=>showToast("Email not sent.","error"));
+      }catch(e){ console.warn("EmailJS not available",e); return Promise.resolve(); }
     }
 
+    /* ====== Calendar rendering ====== */
     function renderCalendar(y,m){
-      const now=new Date();if(!y&&!m){y=now.getFullYear();m=now.getMonth();}
-      displayedYear=y;displayedMonth=m;
-      const first=new Date(y,m,1);
-      monthTitle.textContent=first.toLocaleString("default",{month:"long",year:"numeric"});
-      calGrid.innerHTML="";
-      const start=first.getDay(),days=new Date(y,m+1,0).getDate();
-      for(let i=0;i<start;i++){const e=document.createElement("div");e.className="day-tile";e.style.visibility="hidden";calGrid.appendChild(e);}
-      for(let d=1;d<=days;d++){
-        const date=new Date(y,m,d),iso=fmt(date);
-        const div=document.createElement("div");
-        div.className="day-tile";div.textContent=d;
-        const counts=slotCounts[iso]||{},
-              full=Object.values(counts).filter(v=>v>=maxSlots).length>=TIME_SLOTS.length;
-        if(closedDates[iso]||full)div.classList.add("closed");
-        else if(date<new Date().setHours(0,0,0,0))div.style.opacity=.4;
-        else div.onclick=()=>{dateInput.value=iso;loadSlots(iso);showToast("Selected "+iso,"success");el("bookingFormSection").scrollIntoView({behavior:"smooth"});}
-        const t=new Date();t.setHours(0,0,0,0);
-        if(date.getTime()===t.getTime())div.classList.add("today");
+      const now = new Date();
+      if (!y && !m) { y = now.getFullYear(); m = now.getMonth(); }
+      displayedYear = y; displayedMonth = m;
+      const first = new Date(y,m,1);
+      monthTitle.textContent = first.toLocaleString("default",{month:"long",year:"numeric"});
+      calGrid.innerHTML = "";
+      const start = first.getDay();
+      const daysInMonth = new Date(y,m+1,0).getDate();
+      for (let i=0;i<start;i++){ const e=document.createElement("div"); e.className="day-tile"; e.style.visibility="hidden"; calGrid.appendChild(e); }
+      for (let d=1; d<=daysInMonth; d++){
+        const date = new Date(y,m,d), iso = fmt(date);
+        const div = document.createElement("div"); div.className="day-tile"; div.textContent = d;
+        const counts = slotCounts[iso]||{};
+        const fullyBooked = Object.values(counts).filter(v=>v>=maxSlots).length >= TIME_SLOTS.length;
+        if (closedDates[iso] || fullyBooked) div.classList.add("closed");
+        else if (date < new Date().setHours(0,0,0,0)) div.style.opacity = .5;
+        else div.onclick = ()=>{ dateInput.value = iso; loadSlots(iso); showToast("Selected "+iso,"success"); el("bookingFormSection").scrollIntoView({behavior:"smooth"}); }
+        const t = new Date(); t.setHours(0,0,0,0);
+        if (date.getTime() === t.getTime()) div.classList.add("today");
         calGrid.appendChild(div);
       }
     }
-    prevMonth.onclick=()=>{const d=new Date(displayedYear,displayedMonth-1,1);renderCalendar(d.getFullYear(),d.getMonth());};
-    nextMonth.onclick=()=>{const d=new Date(displayedYear,displayedMonth+1,1);renderCalendar(d.getFullYear(),d.getMonth());};
+    prevMonth.onclick = ()=>{ const d=new Date(displayedYear,displayedMonth-1,1); renderCalendar(d.getFullYear(),d.getMonth()); };
+    nextMonth.onclick = ()=>{ const d=new Date(displayedYear,displayedMonth+1,1); renderCalendar(d.getFullYear(),d.getMonth()); };
     renderCalendar();
 
+    /* ====== Load slots for a date ====== */
     async function loadSlots(dateKey){
-      slotsGrid.innerHTML="";
-      const cSnap=await get(ref(db,`slot_counts/${dateKey}`));
-      const counts=cSnap.exists()?cSnap.val():{};
+      slotsGrid.innerHTML = "";
+      const cSnap = await get(ref(db,`slot_counts/${dateKey}`));
+      const counts = cSnap.exists()?cSnap.val():{};
       TIME_SLOTS.forEach(slot=>{
-        const k=slotKey(slot),c=counts[k]||0,full=c>=maxSlots;
-        const b=document.createElement("button");
-        b.className="slot-btn";
-        b.textContent=slot+(full?" • FULL":"");
-        if(full)b.classList.add("booked");
-        else b.onclick=()=>{timeInput.value=slot;document.querySelectorAll(".slot-btn").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");};
+        const k = slotKey(slot), c = counts[k]||0, full = c>=maxSlots;
+        const b = document.createElement("button"); b.className="slot-btn"; b.textContent = slot + (full ? " • FULL" : "");
+        if (full) b.classList.add("booked"); else b.onclick = ()=>{ timeInput.value = slot; document.querySelectorAll(".slot-btn").forEach(x=>x.classList.remove("selected")); b.classList.add("selected"); };
         slotsGrid.appendChild(b);
       });
     }
 
-    const nameEl=el("name"),emailEl=el("email"),phoneEl=el("phone"),serviceEl=el("service"),notesEl=el("notes");
-    el("bookingForm").addEventListener("keydown",e=>{if(e.key==="Enter")e.preventDefault();});
-    el("submitBookingBtn").addEventListener("click",async e=>{
+    /* ====== Booking submit (click only) ====== */
+    const nameEl = el("name"), emailEl = el("email"), phoneEl = el("phone"), serviceEl = el("service"), notesEl = el("notes");
+    // Prevent Enter key auto-submit
+    el("bookingForm").addEventListener("keydown", e=>{ if (e.key === "Enter") e.preventDefault(); });
+
+    el("submitBookingBtn").addEventListener("click", async e=>{
       e.preventDefault();
-      const name=nameEl.value.trim(),email=emailEl.value.trim(),phone=phoneEl.value.trim(),
-            notes=notesEl.value.trim(),service=serviceEl.value,date=dateInput.value,time=timeInput.value;
-      if(!date||!time)return showToast("Select date & time!","error");
-      const key=slotKey(time),slotRef=ref(db,`slot_counts/${date}/${key}`);
+      const name = nameEl.value.trim(), email = emailEl.value.trim(), phone = phoneEl.value.trim(),
+            notes = notesEl.value.trim(), service = serviceEl.value, date = dateInput.value, time = timeInput.value;
+      if (!date || !time) return showToast("Select date & time!","error");
+      const key = slotKey(time), slotRef = ref(db,`slot_counts/${date}/${key}`);
       try{
-        const booked=await runTransaction(slotRef,c=>(c||0)+1);
-        if(booked.snapshot.val()>maxSlots){showToast("Time slot full!","error");return;}
-        const newRef=push(ref(db,"bookings"));
-        await set(newRef,{name,email,phone,service,date,time,notes,createdAt:new Date().toISOString()});
-        sendEmail("template_td348he",{name,email,phone,service,date,time,notes});
+        const booked = await runTransaction(slotRef, c => (c||0) + 1);
+        if (booked.snapshot.val() > maxSlots) { showToast("Time slot full!","error"); return; }
+        const newRef = push(ref(db,"bookings"));
+        await set(newRef, { name, email, phone, service, date, time, notes, createdAt: new Date().toISOString() });
+        sendEmail("template_td348he", { name, email, phone, service, date, time, notes });
         showToast("Booking successful!","success");
-        el("bookingForm").reset();timeInput.value="";renderCalendar(displayedYear,displayedMonth);
-      }catch(err){console.error(err);showToast("Booking failed!","error");}
+        el("bookingForm").reset(); timeInput.value = ""; renderCalendar(displayedYear,displayedMonth);
+      }catch(err){ console.error(err); showToast("Booking failed!","error"); }
     });
 
-    toBookingBtn.onclick=()=>{frontPage.classList.add("fadeOut");setTimeout(()=>bookingPage.classList.add("show"),400);};
+    /* ====== Front -> Booking transition ====== */
+    toBookingBtn.onclick = ()=>{ document.querySelector("#frontPage").style.transition = "opacity .45s"; document.querySelector("#frontPage").style.opacity = "0"; setTimeout(()=>{ bookingPage.classList.add("show"); window.scrollTo({top:0,behavior:"smooth"}); }, 420); };
 
-    /* Modal */
-    function openModal(html){sectionContent.innerHTML=html;sectionContent.classList.add("fade-section");
-      modalOverlay.style.display="flex";setTimeout(()=>modalOverlay.classList.add("show"),10);}
-    function closeModalNow(){modalOverlay.classList.remove("show");setTimeout(()=>modalOverlay.style.display="none",500);}
-    closeModal.onclick=closeModalNow;modalOverlay.onclick=e=>{if(e.target===modalOverlay)closeModalNow();};
+    /* ====== Modal logic (mobile menu) ====== */
+    function openModal(html){ sectionContent.innerHTML = html; modalOverlay.style.display = "flex"; setTimeout(()=> modalOverlay.classList.add("show"), 10); }
+    function closeModalNow(){ modalOverlay.classList.remove("show"); setTimeout(()=> modalOverlay.style.display = "none", 300); }
+    closeModal.onclick = closeModalNow; modalOverlay.onclick = e => { if (e.target === modalOverlay) closeModalNow(); };
 
-    function menuHTML(){return `<div class="fade-section" style="text-align:center;">
-      <h3>Menu</h3>
-      <button class="btn-primary" style="margin:6px 0;" data-sec="about">About Us</button><br>
-      <button class="btn-primary" style="margin:6px 0;" data-sec="services">Services</button><br>
-      <button class="btn-primary" style="margin:6px 0;" data-sec="protocols">Protocols</button><br>
-      <button class="btn-primary" style="margin:6px 0;" data-sec="contact">Contact</button></div>`;}
+    function menuHTML(){ return `
+      <div style="text-align:center;">
+        <h3>Menu</h3>
+        <button class="btn-primary" data-sec="about" style="margin:6px 0;">About Us</button><br>
+        <button class="btn-primary" data-sec="services" style="margin:6px 0;">Services</button><br>
+        <button class="btn-primary" data-sec="protocols" style="margin:6px 0;">Protocols</button><br>
+        <button class="btn-primary" data-sec="contact" style="margin:6px 0;">Contact</button>
+      </div>`; }
 
-    const sections={
-      about:`<div class="fade-section"><h3>About Us</h3>
-        <p><b>Orthodontics, Implant & General Dentistry</b></p>
-        <p>Dr. Jeff Esparagoza provides quality dental care in Kidapawan City.</p></div>`,
-
-      services:`<div class="fade-section"><h3>Our Services</h3>
-        <ul style="list-style:none;line-height:1.8;padding:0;text-align:center">
-          <li>Pediatric Dentistry</li><li>Restorative Dentistry</li><li>Prosthodontics</li>
-          <li>Veneers & Dental Crown</li><li>Cosmetic Dentistry</li>
-          <li>Oral Surgery</li><li>Orthodontics</li>
-        </ul></div>`,
-
-      protocols:`<div class="fade-section" style="text-align:center;">
-        <h3>COVID-19 Dental Practice Protocols</h3>
-        <p><b>CORONAVIRUS DISEASE 2019 (COVID-19)</b> is an infectious disease caused by severe acute respiratory syndrome coronavirus-2 (SARS-CoV-2).</p>
+    const sections = {
+      about: `<div><h3>About Us</h3><p><b>Orthodontics, Implant & General Dentistry</b></p><p>Dr. Jeff Esparagoza provides quality dental care in Kidapawan City.</p></div>`,
+      services: `<div><h3>Our Services</h3><ul style="list-style:none;padding:0;line-height:1.8"><li>Pediatric Dentistry</li><li>Restorative Dentistry</li><li>Prosthodontics</li><li>Veneers & Dental Crown</li><li>Cosmetic Dentistry</li><li>Oral Surgery</li><li>Orthodontics</li></ul></div>`,
+      protocols: `<div><h3>COVID-19 Dental Practice Protocols</h3>
+        <p><b>CORONAVIRUS DISEASE 2019 (COVID-19)</b> is an infectious disease caused by SARS-CoV-2.</p>
         <p>Common symptoms include fever, cough, fatigue, shortness of breath, and loss of smell.</p>
-        <p>The <b>Centers for Disease Control and Prevention (CDCP)</b> says it is primarily spread during close contact and by small droplets produced when people cough, sneeze, or talk — within approximately 1–2 meters (3–7 ft).</p>
-        <p>The definition shows that the <b>Dental Workforce</b> is at <b>HIGH RISK</b> to contract the said disease. We have created <b>PROTOCOLS</b> which everyone <b>MUST FOLLOW</b>.</p>
-
-        <h4 style="margin-top:12px;">General Instructions</h4>
-        <ul style="list-style:none;margin:0;padding:0;line-height:1.8;">
-          <li>NO MASK, NO ENTRY</li>
-          <li>OBSERVE SOCIAL DISTANCING</li>
-          <li>ALCOHOL IS AVAILABLE FOR PATIENT'S USE</li>
-          <li>Only PATIENTS are allowed inside treatment room</li>
-          <li>We discourage bringing companions EXCEPT for minor and elder persons</li>
-        </ul>
-
-        <h4 style="margin-top:14px;">Schedules / Appointments</h4>
-        <p>New Clinic Hours: <b>Monday to Saturday</b><br>9:00 AM – 4:00 PM</p>
-        <p>Clinic Schedule is now <b>STRICTLY BY APPOINTMENT</b>.</p>
-        <p>Reschedule your appointment if you have fever or are not feeling well.</p>
-      </div>`,
-
-      contact:`<div class="fade-section">
-        <h3 style="margin-bottom:6px;">Contact Us</h3>
-        <div style="line-height:1.5;margin-top:2px;">
-          <p style="margin:2px 0;">📍 Kidapawan City, North Cotabato, Philippines</p>
-          <p style="margin:2px 0;">📞 0977 780 9537</p>
-          <p style="margin:2px 0;">📧 esparagoza.jeffrey@gmail.com</p>
-        </div>
-      </div>`
+        <p>The CDCP says it spreads primarily during close contact and by small droplets when people cough, sneeze or talk (within ~1–2 m).</p>
+        <h4>General Instructions</h4>
+        <ul style="line-height:1.6"><li>NO MASK, NO ENTRY</li><li>OBSERVE SOCIAL DISTANCING</li><li>ALCOHOL IS AVAILABLE FOR PATIENT'S USE</li><li>Only PATIENTS are allowed inside treatment room</li><li>We discourage companions except minors/elders</li></ul>
+        <h4>Schedules / Appointments</h4>
+        <p>New Clinic Hours: <b>Mon–Sat, 9:00 AM – 4:00 PM</b></p>
+        <p>Clinic schedule is now <b>STRICTLY BY APPOINTMENT</b>.</p>
+        <p>Reschedule your appointment if you have fever or are not feeling well.</p></div>`,
+      contact: `<div><h3>Contact Us</h3><p>📍 Kidapawan City, North Cotabato</p><p>📞 0977 780 9537</p><p>📧 esparagoza.jeffrey@gmail.com</p></div>`
     };
 
-    /* === Mobile menu open handler === */
-    menuBtn.addEventListener("click",()=>{
+    menuBtn.addEventListener("click", ()=>{
       openModal(menuHTML());
       setTimeout(()=>{
         document.querySelectorAll("[data-sec]").forEach(btn=>{
-          btn.onclick=()=>{
-            const sec=btn.getAttribute("data-sec");
+          btn.addEventListener("click", ()=> {
+            const sec = btn.getAttribute("data-sec");
             openModal(sections[sec] || "<p>Section not found.</p>");
-          };
+          });
         });
-      },100);
+      }, 120);
     });
+
+    /* ====== Slider logic: fade + manual controls + auto */
+    (function setupSlider(){
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      let idx = slides.findIndex(s => s.classList.contains("show"));
+      if (idx < 0) idx = 0;
+      let timer = null;
+      const show = i => {
+        slides.forEach((s, j) => s.classList.toggle("show", j === i));
+        idx = i;
+      };
+      const next = ()=> show((idx + 1) % slides.length);
+      const prev = ()=> show((idx - 1 + slides.length) % slides.length);
+      document.getElementById("nextSlide").addEventListener("click", ()=>{ next(); resetTimer(); });
+      document.getElementById("prevSlide").addEventListener("click", ()=>{ prev(); resetTimer(); });
+      function startTimer(){ timer = setInterval(next, 4500); }
+      function resetTimer(){ clearInterval(timer); startTimer(); }
+      startTimer();
+      // allow mouse drag / touch swipe optional: keep simple for now
+    })();
+
+    /* ====== Small accessibility: pause video on mobile when hidden (optional) ===== */
+    function handleResponsive(){
+      const v = document.getElementById("heroVideo");
+      if (window.innerWidth <= 900) {
+        try{ v.pause(); }catch(e){}
+      } else {
+        try{ v.play(); }catch(e){}
+      }
+    }
+    window.addEventListener("resize", handleResponsive);
+    handleResponsive();
+
+       /* ====== ensure dropdowns won't overflow off-screen on very small screens (safety) ===== */
+    function adjustDropdowns(){
+      document.querySelectorAll(".nav-item").forEach(item=>{
+        const dd = item.querySelector(".dropdown");
+        if(!dd) return;
+        const rect = dd.getBoundingClientRect();
+        if (rect.right > window.innerWidth - 12) {
+          dd.style.left = "auto";
+          dd.style.right = "0";
+        } else {
+          dd.style.left = "0";
+          dd.style.right = "auto";
+        }
+      });
+    }
+    window.addEventListener("resize", adjustDropdowns);
+    setTimeout(adjustDropdowns,300);
+
   </script>
 </div>
 </body>
