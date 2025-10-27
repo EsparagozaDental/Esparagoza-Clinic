@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Esparagoza Dental Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<style>
+:root{
+  --brand:#0b6bcb;
+  --accent:#2ea0ff;
+  --success:#00b386;
+  --danger:#d9534f;
+  --muted:#758aa2;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif}
+html,body{height:100%;overflow:hidden}
+
+/* ===== BACKGROUND ===== */
+body::before{
+  content:"";
+  position:fixed;inset:0;
+  background:url("https://i.imgur.com/EHVhWYb.jpeg") center/cover no-repeat;
+  filter:blur(8px) brightness(.85);
+  z-index:-2;
+}
+body::after{
+  content:"";
+  position:fixed;inset:0;
+  background:rgba(10,30,60,.4);
+  z-index:-1;
+}
+
+/* ===== PAGES TRANSITION ===== */
+.page{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  overflow-y:auto;transition:opacity .6s ease,transform .6s ease;
+  opacity:0;pointer-events:none;
+}
+.page.active{
+  opacity:1;pointer-events:auto;transform:translateY(0);
+}
+.page.hidden-up{transform:translateY(-20px)}
+.page.hidden-down{transform:translateY(20px)}
+
+/* ===== NAVIGATION ===== */
+.front-top{position:fixed;top:20px;left:20px;z-index:1000}
+.nav-links{display:flex;gap:10px;background:rgba(255,255,255,.08);padding:8px 12px;border-radius:12px}
+.nav-item{position:relative;padding:6px 12px;color:#fff;font-weight:700;cursor:pointer}
+.nav-item:hover{background:rgba(255,255,255,.1)}
+.dropdown{display:none;position:absolute;top:110%;left:0;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);
+  color:var(--brand);padding:12px 14px;border-radius:0;min-width:300px;max-width:420px;box-shadow:0 10px 30px rgba(0,0,0,.14);
+  opacity:0;pointer-events:none;transition:.25s;}
+.nav-item:hover .dropdown{display:block;opacity:1;pointer-events:all;transform:translateY(0)}
+.dropdown h4{margin-bottom:8px;font-size:15px;border-bottom:1px solid #dfeefb;padding-bottom:5px}
+.dropdown p,.dropdown li{font-size:13px;line-height:1.5;margin:4px 0}
+.dropdown ul{padding-left:16px}
+.protocol-scroll{max-height:260px;overflow:auto}
+
+/* ===== HERO ===== */
+.hero{text-align:center;padding-top:120px;padding-bottom:40px;color:#fff}
+.logo-big{width:180px;height:auto;margin-bottom:14px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.welcome{font-size:28px;font-weight:700;margin-bottom:6px}
+.hero-sub{color:#dfe8f6;font-size:14px;margin-bottom:12px}
+.btn-primary{
+  background:linear-gradient(90deg,var(--accent),var(--brand));
+  color:#fff;border:none;border-radius:10px;padding:12px 20px;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
+}
+
+/* ===== MEDIA SHOWCASE ===== */
+.media-showcase{display:flex;align-items:center;justify-content:center;gap:24px;padding:30px;margin:0 auto;max-width:1100px}
+.media-showcase img,.media-showcase video{
+  width:480px;height:270px;border-radius:16px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);object-fit:cover;
+}
+@media(max-width:900px){.media-showcase{flex-direction:column}.media-showcase img,.media-showcase video{width:100%;height:auto}}
+
+/* ===== BOOKING PAGE ===== */
+#bookingPage{max-width:1000px;margin:60px auto;padding:20px;color:#fff}
+.card{background:rgba(255,255,255,.1);backdrop-filter:blur(6px);
+  border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.3);padding:18px;margin:20px auto;max-width:600px}
+label{display:block;margin-top:8px;font-weight:600}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #cde0f7;border-radius:8px;margin-top:4px;font-size:15px;background:rgba(255,255,255,.9)}
+.toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:10000}
+.toast{background:var(--brand);color:#fff;padding:10px 16px;border-radius:8px;margin-top:8px;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+</style>
+</head>
+
+  <body>
+<div class="app">
+
+  <!-- NAV -->
+  <div class="front-top">
+    <nav class="nav-links">
+      <div class="nav-item">About Us
+        <div class="dropdown">
+          <h4>About Us</h4>
+          <p><b>Orthodontics, Implant & General Dentistry</b></p>
+          <p>Dr. Jeff Esparagoza provides quality dental care in Kidapawan City.</p>
+        </div>
+      </div>
+      <div class="nav-item">Services
+        <div class="dropdown">
+          <h4>Services</h4>
+          <ul>
+            <li>Pediatric Dentistry</li><li>Restorative Dentistry</li><li>Prosthodontics</li>
+            <li>Veneers & Dental Crown</li><li>Cosmetic Dentistry</li><li>Oral Surgery</li><li>Orthodontics</li>
+          </ul>
+        </div>
+      </div>
+      <div class="nav-item">Protocols
+        <div class="dropdown protocol-scroll">
+          <h4>COVID-19 Dental Practice Protocols</h4>
+          <p><b>CORONAVIRUS DISEASE 2019 (COVID-19)</b> is an infectious disease caused by SARS-CoV-2.</p>
+          <p>Common symptoms include fever, cough, fatigue, shortness of breath, and loss of smell.</p>
+          <p>The <b>CDCP</b> says it spreads primarily by droplets within 1–2 meters.</p>
+          <p>The <b>Dental Workforce</b> is at <b>HIGH RISK</b>. Follow all protocols below.</p>
+          <h4>General Instructions</h4>
+          <ul>
+            <li>NO MASK, NO ENTRY</li><li>OBSERVE SOCIAL DISTANCING</li>
+            <li>ALCOHOL IS AVAILABLE FOR PATIENT'S USE</li>
+            <li>Only PATIENTS are allowed inside treatment room</li>
+            <li>No companions except minors or elders</li>
+          </ul>
+          <h4>Schedules / Appointments</h4>
+          <p>Clinic Hours: Mon – Sat · 9 AM – 4 PM · Strictly by appointment.</p>
+        </div>
+      </div>
+      <div class="nav-item">Contact
+        <div class="dropdown">
+          <h4>Contact Us</h4>
+          <p>📍 Kidapawan City, North Cotabato</p>
+          <p>📞 0977 780 9537</p>
+          <p>📧 esparagoza.jeffrey@gmail.com</p>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- FRONT PAGE -->
+  <section id="frontPage" class="page active">
+    <div class="hero">
+      <img src="https://i.imgur.com/t942gBV.png" class="logo-big" alt="logo">
+      <div class="welcome">Welcome to Esparagoza Dental Clinic</div>
+      <div class="hero-sub">Orthodontics • Implant • General Dentistry — Kidapawan City</div>
+      <button class="btn-primary" id="openBooking">Make an Appointment</button>
+    </div>
+
+    <section class="media-showcase">
+      <img src="https://images.unsplash.com/photo-1606813909026-07c58b8de3f6?w=900&auto=format&fit=crop" alt="Clinic">
+      <video autoplay muted loop playsinline>
+        <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+      </video>
+    </section>
+  </section>
+
+  <!-- BOOKING PAGE -->
+  <main id="bookingPage" class="page hidden-down">
+    <div class="card">
+      <h3>Book an Appointment</h3>
+      <form id="bookingForm">
+        <label>Full Name</label><input type="text" id="name" required>
+        <label>Email</label><input type="email" id="email" required>
+        <label>Phone</label><input type="text" id="phone" required>
+        <label>Service</label>
+        <select id="service" required>
+          <option>Pediatric Dentistry</option>
+          <option>Restorative Dentistry</option>
+          <option>Orthodontics</option>
+        </select>
+        <label>Date</label><input type="date" id="date" required>
+        <label>Time</label><input type="time" id="time" required>
+        <label>Notes</label><textarea id="notes" rows="3"></textarea>
+        <button class="btn-primary" type="button" id="submitBookingBtn">Submit Booking</button>
+      </form>
+      <button class="btn-primary" style="margin-top:14px" id="backHomeBtn">Back to Home</button>
+    </div>
+  </main>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  const app = initializeApp({
+    apiKey:"AIzaSyCV39b2CkzS_tt75SVXa6z95s6f4qVlfLg",
+    authDomain:"esparagozadentalclinic-6a744.firebaseapp.com",
+    databaseURL:"https://esparagozadentalclinic-6a744-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:"esparagozadentalclinic-6a744",
+    storageBucket:"esparagozadentalclinic-6a744.firebasestorage.app",
+    messagingSenderId:"959639046373",
+    appId:"1:959639046373:web:ccf39df13d94e527fcec0c"
+  });
+  const db = getDatabase(app);
+
+  const el=id=>document.getElementById(id);
+  const toastWrap=el("toastWrap");
+  function showToast(msg,type="info"){const t=document.createElement("div");t.className=`toast ${type}`;t.textContent=msg;toastWrap.appendChild(t);setTimeout(()=>t.classList.add("show"),100);setTimeout(()=>t.remove(),3000);}
+
+  /* ===== PAGE TRANSITION ===== */
+  const front=el("frontPage"),book=el("bookingPage");
+  function openBooking(){front.classList.remove("active");front.classList.add("hidden-up");book.classList.remove("hidden-down");setTimeout(()=>book.classList.add("active"),60);}
+  function backHome(){book.classList.remove("active");book.classList.add("hidden-down");setTimeout(()=>front.classList.add("active"),60);}
+  el("openBooking").onclick=openBooking;
+  el("backHomeBtn").onclick=backHome;
+
+  /* ===== BOOKING SUBMIT ===== */
+  const nameEl=el("name"),emailEl=el("email"),phoneEl=el("phone"),serviceEl=el("service"),dateEl=el("date"),timeEl=el("time"),notesEl=el("notes");
+  el("submitBookingBtn").onclick=async()=>{
+    const name=nameEl.value.trim(),email=emailEl.value.trim(),phone=phoneEl.value.trim(),service=serviceEl.value.trim(),date=dateEl.value,time=timeEl.value,notes=notesEl.value.trim();
+    if(!name||!email||!phone||!service||!date||!time)return showToast("Please fill all fields","error");
+    try{
+      const newRef=push(ref(db,"bookings"));
+      await set(newRef,{name,email,phone,service,date,time,notes,createdAt:new Date().toISOString()});
+      emailjs.init("cVyQCkIy0P6hPyKrH");
+      await emailjs.send("service_7k6q958","template_td348he",{name,email,phone,service,date,time,notes});
+      showToast("Booking submitted!","success");
+      el("bookingForm").reset();
+    }catch(e){console.error(e);showToast("Failed to submit","error");}
+  };
+</script>
+</body>
+</html>
