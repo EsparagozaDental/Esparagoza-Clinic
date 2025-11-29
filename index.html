@@ -39,11 +39,14 @@ body{
   position:fixed;
   inset:0;
   background-image:url('https://i.imgur.com/XHK6ZcB.png');
-  background-size:cover;
-  background-position:center;
+  background-size:contain;          /* prevents zoom */
+  background-position:bottom;       /* shows only the clean lower area */
+  background-repeat:no-repeat;      /* stops tiling */
+  background-color:#d9e4ff;         /* soft fallback color */
   display:flex;
-  align-items:center;
+  align-items:flex-start;           /* move content downward */
   justify-content:center;
+  padding-top:160px;                /* push welcome text below logo area */
   z-index:40;
   opacity:1;
   transform:scale(1);
